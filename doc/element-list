@@ -1,0 +1,10 @@
+renderer.algebra
+renderer.controller
+renderer.core.camera
+renderer.core.light
+renderer.core.mesh
+renderer.core.rasterizer
+renderer.core.shader
+renderer.core.shader.colormap
+renderer.doc
+renderer.gui

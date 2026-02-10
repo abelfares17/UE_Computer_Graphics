@@ -1,0 +1,145 @@
+@startuml "Class Diagram"
+left to right direction
+title "Class Diagram"
+hide empty members
+package renderer.algebra{
+
+abstract class renderer.algebra.ArrayBase {
++ getName() : String
++ setName() : void
++ size() : int
+}
+
+class renderer.algebra.MathUtils {
+	+ {static} isInRange(Number, Number, Number) : boolean
+	+ {static} clamp() : Comparable
+	- {static} isIntegerType(Number) : boolean
+	- {static} isFloatingType(Number) : boolean
+}
+class renderer.algebra.Vector extends renderer.algebra.ArrayBase{
+	+ homogeneousPoint() : Vector
+	+ homogeneousVector() : Vector  
+	+ norm() : double
+	+ clamp(double, double) : Vector
+	+ cross(Vector) : Vector
+	+ ones() : Vector
+	+ add(Vector) : Vector
+	+ dot(Vector) : double
+	+ set(int, double) : void
+	+ set(double[]) : void
+	+ normalize() : Vector
+	+ zeros() : Vector
+	+ subtract(Vector) : Vector
+}
+class renderer.algebra.Matrix extends renderer.algebra.ArrayBase {
+	+ {static} createIdentity(int) : Matrix
+	+ getSubMatrix(int, int, int, int) : Matrix
+	+ transpose() : Matrix
+	+ {static} createRandom(String, int, int) : Matrix
+	+ setCol(int, Vector) : void
+	+ getCol(int) : Vector
+	+ setRow(int, Vector) : void
+	+ getRow(int) : Vector
+	+ getNRows() : int
+	+ getNCols() : int
+	+ getName() : String
+	+ add(Matrix) : Matrix
+	+ get(int, int) : double
+	+ scale(double) : Matrix
+	+ set(int, int, double) : void
+	+ multiply(Matrix) : Matrix
+	+ multiply(Vector) : Vector
+	+ subtract(Matrix) : Matrix
+}
+}
+
+package renderer.controller{
+
+class renderer.controller.ShaderFactory {
+}
+class renderer.controller.ImageWrapper {
+}
+class renderer.controller.Renderer {
+	+ projectVertices() : Fragment[]
+	+ setShader(Shader) : void
+	- renderVertices() : void
+	- renderWireframe() : void
+	- renderSolid() : void
+	+ renderNormal() : void
+}
+}
+
+
+
+class renderer.core.mesh.Scene {
+	+ getCameraPosition() : Vector
+	+ getCameraLookAt() : Vector
+	+ getCameraUp() : Vector
+	+ getCameraFocal() : double
+}
+class renderer.core.mesh.Mesh {
+	+ getVertices() : Vector[]
+	+ getNormals() : Vector[]
+	+ getColors() : double[]
+
+	+ getFaces() : int[]
+}
+class renderer.core.mesh.Texture {
++ sample(double, double) : Color
+}
+class renderer.core.rasterizer.PerspectiveCorrectRasterizer extends renderer.core.rasterizer.Rasterizer{
+}
+class renderer.core.rasterizer.Rasterizer {
+	# shader : Shader
+	+ rasterizeEdge(Fragment, Fragment) : void
+	+ rasterizeVertex(Fragment) : void
+	+ rasterizeFace(Fragment, Fragment, Fragment) : void
+}
+class renderer.core.camera.Transformation {
+	+ projectPoint(Vector) : Vector
+	+ setLookAt(Vector, Vector, Vector) : void
+	+ setProjection() : void
+	+ setCalibration(double, double, double) : void
+	+ transformVector(Vector) : Vector
+}
+abstract class renderer.core.shader.Shader {
++ shade(Fragment) : void
+}
+class renderer.core.shader.PainterShader extends renderer.core.shader.Shader {
+}
+class renderer.core.shader.DepthBuffer {
+}
+class renderer.core.shader.SimpleShader extends renderer.core.shader.Shader {
+}
+class renderer.core.shader.TextureShader extends renderer.core.shader.Shader {
+}
+
+class renderer.core.shader.Fragment {
+	- x : int
+	- y : int
+	- numAttributes : int
+}
+class renderer.core.light.Lighting {
+	+ applyLights() : double[]
+}
+abstract class renderer.core.light.Light {
++ {abstract} getContribution() : double
+}
+class renderer.core.light.PointLight extends renderer.core.light.Light{
+}
+class renderer.core.light.AmbientLight extends renderer.core.light.Light{
+}
+
+renderer.core.light.Lighting o-- renderer.core.light.Light : contains
+renderer.core.shader.Shader o-- renderer.controller.ImageWrapper
+renderer.core.shader.PainterShader o-- renderer.core.shader.DepthBuffer
+renderer.controller.Renderer o-- renderer.core.camera.Transformation
+renderer.controller.Renderer o-- renderer.core.light.Lighting
+renderer.controller.Renderer o-- renderer.core.mesh.Mesh
+renderer.controller.Renderer o-- renderer.core.mesh.Scene
+renderer.controller.Renderer o-- renderer.core.rasterizer.Rasterizer
+renderer.core.rasterizer.Rasterizer o-- renderer.core.shader.Shader
+'renderer.core.shader.TextureShader o-- renderer.core.mesh.Texture
+
+
+

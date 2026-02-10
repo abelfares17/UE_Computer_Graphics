@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"renderer.algebra"},{"l":"renderer.controller"},{"l":"renderer.core.camera"},{"l":"renderer.core.light"},{"l":"renderer.core.mesh"},{"l":"renderer.core.rasterizer"},{"l":"renderer.core.shader"},{"l":"renderer.core.shader.colormap"},{"l":"renderer.doc"},{"l":"renderer.gui"}]
