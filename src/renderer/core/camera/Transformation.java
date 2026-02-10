@@ -55,35 +55,18 @@ public class Transformation {
             R_cw.setCol(1, x);
             R_cw.setCol(2, y);
             R_cw.setCol(3, z);
+            Matrix R_wc = R_cw.transpose();
 
+            Vector t = (R_wc.multiply(eye)).scale(-1);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // compute translation
-            
-
-
-
-
-
-
-
-
-
-
-
-
+            worldToCamera.set(3,3,1);
+            for (int i = 0; i<3; i++){
+                for (int j = 0; j<3; j++){
+                    worldToCamera.set(i, j, R_wc.get(i,j));
+                }
+                worldToCamera.set(i,3,t.get(i));
+                worldToCamera.set(3,i, 0);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
