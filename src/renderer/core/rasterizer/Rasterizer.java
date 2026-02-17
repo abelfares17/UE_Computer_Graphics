@@ -1,9 +1,9 @@
 package renderer.core.rasterizer;
 
-import renderer.algebra.Matrix;
-import renderer.algebra.Vector;
 import renderer.algebra.MathUtils;
+import renderer.algebra.Matrix;
 import renderer.algebra.SizeMismatchException;
+import renderer.algebra.Vector;
 import renderer.core.shader.Fragment;
 import renderer.core.shader.Shader;
 
@@ -266,10 +266,34 @@ public class Rasterizer {
         final Matrix cMat = makeBarycentricCoordsMatrix(v1, v2, v3);
 
         // iterate over the triangle's bounding box
-        // TODO
+        final int minX = (int) Math.floor(Math.min(v1.getX(), Math.min(v2.getX(), v3.getX())));
+        final int maxX = (int) Math.ceil(Math.max(v1.getX(), Math.max(v2.getX(), v3.getX())));
+        final int minY = (int) Math.floor(Math.min(v1.getY(), Math.min(v2.getY(), v3.getY())));
+        final int maxY = (int) Math.ceil(Math.max(v1.getY(), Math.max(v2.getY(), v3.getY())));
 
-
-
+        Vector f = new Vector(3);
+        Fragment fragment = new Fragment(0, 0);
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                f.set(0, 1);
+                f.set(1, x);
+                f.set(2, y);
+                Vector baryCoords = cMat.multiply(f);
+                if (baryCoords.get(0) >= 0 && baryCoords.get(1) >= 0 && baryCoords.get(2) >= 0) {
+                    fragment.setPosition(x, y);
+                    for (int i = 0; i < v1.getNumAttributes(); i++) {
+                        double interpolated = baryCoords.get(0) * v1.getAttribute(i)
+                                + baryCoords.get(1) * v2.getAttribute(i)
+                                + baryCoords.get(2) * v3.getAttribute(i);
+                        if (i >= Fragment.COLOR_R && i <= Fragment.COLOR_B) {
+                            interpolated = MathUtils.clamp(interpolated, 0., 1.);
+                        }
+                        fragment.setAttribute(i, interpolated);
+                    }
+                    shader.shade(fragment);
+                }
+            }    
+        }
 
 
 

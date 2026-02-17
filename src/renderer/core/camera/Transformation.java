@@ -52,9 +52,21 @@ public class Transformation {
             Vector y = z.cross(x);
 
             Matrix R_cw = Matrix.createIdentity(3);
+            /*
             R_cw.setCol(1, x);
             R_cw.setCol(2, y);
             R_cw.setCol(3, z);
+            */
+           for (int i = 0; i < 3; i++) {
+               for (int j = 0; j < 3; j++) {
+                   R_cw.set(i, j, switch (j) {
+                       case 0 -> x.get(i);
+                       case 1 -> y.get(i);
+                       case 2 -> z.get(i);
+                       default -> throw new IllegalStateException("Unexpected value: " + j);
+                   });
+               }
+           }
             Matrix R_wc = R_cw.transpose();
 
             Vector t = (R_wc.multiply(eye)).scale(-1);
@@ -79,9 +91,14 @@ public class Transformation {
      * Sets the projection matrix.
      */
     public void setProjection() {
-        // TODO
-
-
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 4; j++) {
+                projection.set(i, j, 0);
+            }
+        }
+        projection.set(0, 0, 1);
+        projection.set(1, 1, 1);
+        projection.set(2, 2, 1);
 
 
         System.out.println("Projection matrix:\n" + projection);
@@ -95,12 +112,11 @@ public class Transformation {
      */
     public void setCalibration(double focal, double width, double height) {
 
-        // TODO
-
-
-
-
-
+        calibration.set(0, 0, focal);
+        calibration.set(1, 1, focal);
+        calibration.set(0, 2, width / 2);
+        calibration.set(1, 2, height / 2);
+        calibration.set(2, 2, 1);
         System.out.println("Calibration matrix:\n" + calibration);
     }
 
@@ -114,11 +130,24 @@ public class Transformation {
      * @throws SizeMismatchException if the size of the input vector is not 3
      */
     public Vector projectPoint(Vector p) throws SizeMismatchException {
-        // TODO
+        // 1. Convertir le point en coordonnées homogènes (3 -> 4)
+        Vector ph = p.homogeneousPoint();
+
+        // 2. Appliquer la matrice de transformation du monde vers la caméra
+        Vector pcam = worldToCamera.multiply(ph);
+
+        // 3. Appliquer la matrice de projection
+        Vector pproj = projection.multiply(pcam);
+
+        // 4. Appliquer la matrice de calibration
+        Vector pcalib = calibration.multiply(pproj);
+
+        // 5. Division par z pour la perspective
+        double depth = pcalib.get(2);
         Vector ps = new Vector(3);
-
-
-
+        ps.set(0, pcalib.get(0) / depth);
+        ps.set(1, pcalib.get(1) / depth);
+        ps.set(2, depth);
 
         return ps;
     }
